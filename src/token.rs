@@ -13,6 +13,7 @@ pub enum Token {
     Keyword(String),         // Exemple : "console" ou "log"
     Identifier(String),      // Nom de fonction ou variable, ici : "log"
     Literal(String),         // Chaîne de caractères, ici : "Hello, world!"
+    Number(f64),             // Nombres (ex: 42, 3.14)
     Symbol(char),            // Symboles comme '(', ')', ';'
     EOF,                     // Fin de fichier
 }
