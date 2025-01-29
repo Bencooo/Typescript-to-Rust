@@ -12,4 +12,16 @@
 #[derive(Debug, Clone)]
 pub enum TypeScriptNode {
     ConsoleLog(String),   // Ex : console.log("Hello, world!")
+
+    // ✅ Ajout de la déclaration de variable
+    VariableDeclaration {
+        name: String,
+        value: String, // Peut être un nombre ou une chaîne
+    },
+
+    // ✅ Ajout du support pour les conditions
+    IfStatement {
+        condition: String,
+        body: Vec<TypeScriptNode>, // Liste d'instructions à exécuter
+    },
 }
