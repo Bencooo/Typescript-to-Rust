@@ -15,5 +15,6 @@ pub enum Token {
     Literal(String),         // Chaîne de caractères, ici : "Hello, world!"
     Number(f64),             // Nombres (ex: 42, 3.14)
     Symbol(char),            // Symboles comme '(', ')', ';'
+    Assign,                  // Symbole '='
     EOF,                     // Fin de fichier
 }
