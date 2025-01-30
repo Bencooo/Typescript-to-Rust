@@ -9,20 +9,30 @@
 
 use crate::transformer::RustNode;
 
-pub fn generate_code(node: RustNode) -> String {
-    match node {
-        // ✅ Génération d'un println! en Rust
-        RustNode::Println(text) => format!("println!(\"{}\");", text),
+pub fn generate_code(nodes: Vec<RustNode>) -> String {
+    nodes
+        .into_iter()
+        .map(|node| match node {
+            RustNode::Println(text) => text,
 
-        // ✅ Génération d'une déclaration de variable Rust
-        RustNode::VariableDeclaration { name, value } => {
-            format!("let {} = {};", name, value)
-        }
+            RustNode::VariableDeclaration { name, value } => {
+                if value.parse::<f64>().is_ok() {
+                    format!("let {} = {};", name, value) // ✅ Si c'est un nombre, on garde tel quel
+                } else {
+                    format!("let {} = \"{}\".to_string();", name, value) // ✅ Si c'est une chaîne, on met des guillemets
+                }
+            }
 
-        // ✅ Génération d'une structure conditionnelle Rust
-        RustNode::IfStatement { condition, body } => {
-            let body_code: String = body.into_iter().map(generate_code).collect::<Vec<String>>().join("\n    ");
-            format!("if {} {{\n    {}\n}}", condition, body_code)
-        }
-    }
+            RustNode::IfStatement { condition, body } => {
+                let body_code: String = body
+                    .into_iter()
+                    .map(|stmt| generate_code(vec![stmt])) // ✅ Générer chaque ligne du `if`
+                    .collect::<Vec<String>>()
+                    .join("\n    ");
+                format!("if {} {{\n    {}\n}}", condition, body_code)
+            }
+        })
+        .collect::<Vec<String>>()
+        .join("\n") // ✅ Ajouter un saut de ligne entre chaque instruction
 }
+

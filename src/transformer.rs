@@ -22,15 +22,39 @@ pub enum RustNode {
 
 pub fn transform(node: TypeScriptNode) -> RustNode {
     match node {
-        TypeScriptNode::ConsoleLog(text) => RustNode::Println(text),
+        // ✅ Gestion correcte de `console.log(...)`
+        TypeScriptNode::ConsoleLog(text) => {
+            println!("✅ DEBUG: Transformer - Début conversion ConsoleLog({:?})", text);
+
+            if text.starts_with('"') && text.ends_with('"') {
+                // ✅ C'est un `Literal`, on enlève les guillemets
+                let cleaned_text = text.trim_matches('"').to_string();
+                println!("✅ DEBUG: ConsoleLog CHAÎNE → Avant: {:?}, Après: {:?}", text, cleaned_text);
+                RustNode::Println(format!("println!(\"{}\");", cleaned_text))
+            } else {
+                // ✅ C'est une `Variable`, on utilise `{}` dans println!
+                println!("✅ DEBUG: ConsoleLog VARIABLE → {:?}", text);
+                RustNode::Println(format!("println!(\"{{}}\", {});", text))
+            }
+        }
 
         // ✅ Transformation d'une variable TypeScript en variable Rust
         TypeScriptNode::VariableDeclaration { name, value } => {
-            RustNode::VariableDeclaration { name, value }
+            println!("✅ DEBUG: Transformer - Déclaration variable : {} = {}", name, value);
+            
+            // ✅ Ajoute `.to_string()` si c'est une chaîne
+            let rust_value = if value.starts_with('"') && value.ends_with('"') {
+                format!("{}.to_string()", value)
+            } else {
+                value
+            };
+
+            RustNode::VariableDeclaration { name, value: rust_value }
         }
 
         // ✅ Transformation d'un `if` TypeScript en `if` Rust
         TypeScriptNode::IfStatement { condition, body } => {
+            println!("✅ DEBUG: Transformer - If Statement avec condition `{}`", condition);
             let transformed_body: Vec<RustNode> = body.into_iter().map(transform).collect();
             RustNode::IfStatement {
                 condition,
@@ -39,4 +63,8 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
         }
     }
 }
+
+
+
+
 

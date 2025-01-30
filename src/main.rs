@@ -12,6 +12,7 @@ mod generator;
 use lexer::lex;
 use parser::parse;
 use transformer::transform;
+use transformer::RustNode;
 use generator::generate_code;
 use std::fs::{File, read_to_string};
 use std::io::Write;
@@ -24,7 +25,7 @@ fn main() {
     // Étapes de la transformation
     let tokens = lex(&code);
     let ast = parse(tokens);
-    let rust_ast = transform(ast);
+    let rust_ast = ast.into_iter().map(transform).collect::<Vec<RustNode>>();
     let rust_code = generate_code(rust_ast);
 
     // Afficher le code Rust généré dans la console (optionnel)

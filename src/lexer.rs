@@ -1,9 +1,9 @@
 // 2 - lexeur pour l'analyse lexicale
 
-// Contient le lexeur, qui convertit le code source TypeScript 
-// en une liste de Token. 
-// Il gère le traitement des mots-clés, identifiants, 
-// littéraux, symboles, et autres éléments syntaxiques. 
+// Contient le lexeur, qui convertit le code source TypeScript
+// en une liste de Token.
+// Il gère le traitement des mots-clés, identifiants,
+// littéraux, symboles, et autres éléments syntaxiques.
 // C’est la première étape du pipeline de compilation.
 
 // src/lexer.rs
@@ -22,7 +22,7 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Keyword("console".to_string()));
                 i += "console".len();
             }
-            // ✅ Détection de `log` (doit venir après `console`)
+            // ✅ Détection de `log`
             'l' if code[i..].starts_with("log") => {
                 tokens.push(Token::Identifier("log".to_string()));
                 i += "log".len();
@@ -55,13 +55,23 @@ pub fn lex(code: &str) -> Vec<Token> {
             }
 
             // ✅ Détection des identifiants (variables, fonctions)
+            // ✅ Détection des identifiants (variables, fonctions)
+            // ✅ Détection des identifiants (variables, fonctions)
             _ if chars[i].is_alphabetic() => {
                 let start = i;
-                while i < chars.len() && chars[i].is_alphanumeric() {
+                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {
                     i += 1;
                 }
-                let ident = &code[start..i];
-                tokens.push(Token::Identifier(ident.to_string()));
+                let mut ident = code[start..i].to_string();
+
+                // ✅ Forcer la suppression des guillemets s'ils sont présents
+                if ident.starts_with('"') && ident.ends_with('"') {
+                    ident = ident[1..ident.len() - 1].to_string();
+                }
+
+                //println!("✅ DEBUG: Lexer - Ajout Identifier `{}`", ident); // Debug clair
+                println!("✅ DEBUG: Lexer - Ajout Identifier {:?}", ident);
+                tokens.push(Token::Identifier(ident));
             }
 
             // ✅ Détection des nombres (42, 3.14)
@@ -77,10 +87,17 @@ pub fn lex(code: &str) -> Vec<Token> {
             // ✅ Détection des chaînes de caractères `"Hello"`
             '"' => {
                 let start = i + 1;
-                let end_index = code[start..].find('"').unwrap() + start;
-                let literal_value = &code[start..end_index];
-                tokens.push(Token::Literal(literal_value.to_string()));
-                i = end_index + 1;
+                if let Some(end_offset) = code[start..].find('"') {
+                    let end_index = start + end_offset;
+                    let literal_value = &code[start..end_index];
+
+                    println!("✅ DEBUG: Lexer Détection de chaîne → {}", literal_value); // 🛠️ Debug
+                    tokens.push(Token::Literal(literal_value.to_string())); // ✅ Ajoute comme Literal
+
+                    i = end_index + 1;
+                } else {
+                    println!("❌ ERREUR: Chaîne non fermée !");
+                }
             }
 
             // ✅ Détection de l'affectation `=`
@@ -99,8 +116,8 @@ pub fn lex(code: &str) -> Vec<Token> {
             _ => i += 1,
         }
     }
+    println!("✅ DEBUG: Tokens générés : {:?}", tokens);
 
     tokens.push(Token::EOF); // Marque la fin du fichier
     tokens
 }
-
