@@ -1,3 +1,4 @@
-let message = "Hello, Rust!".to_string();
-println!("{}", message);
-println!("Condition validée !");
+println!("{}", x);
+if true {
+    println!("x est plus petit que 10 !");
+}

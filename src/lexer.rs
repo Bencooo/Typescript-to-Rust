@@ -100,11 +100,26 @@ pub fn lex(code: &str) -> Vec<Token> {
                 }
             }
 
+            // ✅ Détection des opérateurs de comparaison (`<`, `>`, `<=`, `>=`, `==`, `!=`)
+            '<' | '>' | '=' | '!' => {
+                let mut op = chars[i].to_string();
+                i += 1;
+
+                // Vérifie si l'opérateur est suivi de '=' (ex: `<=`, `>=`, `!=`, `==`)
+                if i < chars.len() && chars[i] == '=' {
+                    op.push('=');
+                    i += 1;
+                }
+
+                println!("✅ DEBUG: Lexer - Détection de l'opérateur `{}`", op); // Debug
+                tokens.push(Token::Operator(op));
+            }
+
             // ✅ Détection de l'affectation `=`
-            '=' => {
+            /*'=' => {
                 tokens.push(Token::Assign);
                 i += 1;
-            }
+            }*/
 
             // ✅ Détection des symboles `(`, `)`, `{`, `}`, `;`
             '(' | ')' | '{' | '}' | ';' => {

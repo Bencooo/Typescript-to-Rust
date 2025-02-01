@@ -16,5 +16,6 @@ pub enum Token {
     Number(f64),             // Nombres (ex: 42, 3.14)
     Symbol(char),            // Symboles comme '(', ')', ';'
     Assign,                  // Symbole '='
+    Operator(String),  
     EOF,                     // Fin de fichier
 }

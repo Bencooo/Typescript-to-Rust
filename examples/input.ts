@@ -1,6 +1,6 @@
-const message = "Hello, Rust!";
-console.log(message);
+const x = false;
+console.log(x);
 
 if (true) {
-    console.log("Condition validée !");
+    console.log("x est plus petit que 10 !");
 }
