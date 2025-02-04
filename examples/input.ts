@@ -1,4 +1,4 @@
-const x = false;
+const x = true;
 console.log(x);
 
 if (true) {

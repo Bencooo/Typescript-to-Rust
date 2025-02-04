@@ -53,6 +53,16 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Keyword("return".to_string()));
                 i += "return".len();
             }
+            't' if code[i..].starts_with("true") => {
+                tokens.push(Token::Boolean(true));
+                i += "true".len();
+                println!("✅ DEBUG: Lexer - Détection du booléen `true`");
+            }
+            'f' if code[i..].starts_with("false") => {
+                tokens.push(Token::Boolean(false));
+                i += "false".len();
+                println!("✅ DEBUG: Lexer - Détection du booléen `false`");
+            }
 
             // ✅ Détection des identifiants (variables, fonctions)
             // ✅ Détection des identifiants (variables, fonctions)
@@ -73,6 +83,18 @@ pub fn lex(code: &str) -> Vec<Token> {
                 println!("✅ DEBUG: Lexer - Ajout Identifier {:?}", ident);
                 tokens.push(Token::Identifier(ident));
             }
+
+            _ if code[i..].starts_with("true") && (i + 4 >= chars.len() || !chars[i + 4].is_alphanumeric()) => {
+                tokens.push(Token::Keyword("true".to_string()));
+                println!("✅ DEBUG: Lexer - Détection du booléen `true`");
+                i += 4; // Avance après `true`
+            },
+            
+            _ if code[i..].starts_with("false") && (i + 5 >= chars.len() || !chars[i + 5].is_alphanumeric()) => {
+                tokens.push(Token::Keyword("false".to_string()));
+                println!("✅ DEBUG: Lexer - Détection du booléen `false`");
+                i += 5; // Avance après `false`
+            },
 
             // ✅ Détection des nombres (42, 3.14)
             _ if chars[i].is_digit(10) => {

@@ -103,7 +103,14 @@ pub fn parse(tokens: Vec<Token>) -> Vec<TypeScriptNode> {
                                     value: value.clone(),
                                 });
                                 i += 1;
-                            } 
+                            } else if let Token::Boolean(value) = &tokens[i] {  // ✅ Ajout des booléens
+                                println!("✅ DEBUG: Valeur booléenne détectée `{}`", value);
+                                nodes.push(TypeScriptNode::VariableDeclaration {
+                                    name: var_name.clone(),
+                                    value: value.to_string(),
+                                });
+                                i += 1;
+                            }
                         }
                     }
                 }

@@ -1,4 +1,5 @@
+let x = "true".to_string();
 println!("{}", x);
-if true {
+if  {
     println!("x est plus petit que 10 !");
 }
