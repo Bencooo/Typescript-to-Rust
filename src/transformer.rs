@@ -45,6 +45,8 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
             // ✅ Ajoute `.to_string()` si c'est une chaîne
             let rust_value = if value.starts_with('"') && value.ends_with('"') {
                 format!("{}.to_string()", value)
+            } else if value == "true" || value == "false" {
+                format!("{}", value) // ✅ Pas de conversion pour `true` et `false`
             } else {
                 value
             };

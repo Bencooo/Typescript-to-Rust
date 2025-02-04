@@ -1,4 +1,4 @@
-const x = true;
+const x = "Hello";
 console.log(x);
 
 if (true) {

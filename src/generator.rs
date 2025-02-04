@@ -16,10 +16,12 @@ pub fn generate_code(nodes: Vec<RustNode>) -> String {
             RustNode::Println(text) => text,
 
             RustNode::VariableDeclaration { name, value } => {
-                if value.parse::<f64>().is_ok() {
+                if value == "true" || value == "false" {
+                    format!("let {} = {};", name, value) // ✅ Si c'est un booléen, on le garde sans guillemets
+                } else if value.parse::<f64>().is_ok() {
                     format!("let {} = {};", name, value) // ✅ Si c'est un nombre, on garde tel quel
                 } else {
-                    format!("let {} = \"{}\".to_string();", name, value) // ✅ Si c'est une chaîne, on met des guillemets
+                    format!("let {} = \"{}\".to_string();", name, value) // ✅ Si c'est une chaîne, on met `.to_string()`
                 }
             }
 
