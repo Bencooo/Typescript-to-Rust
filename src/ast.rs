@@ -1,27 +1,40 @@
-// 3 - Définition de l'AST pour les deux anguage (ts et rust)
+// Le fichier AST va contenir les structures de données pour les langages TypeScript et Rust
 
-// Définit les structures de données pour les deux AST 
-// (TypeScript et Rust). Ce fichier centralise la représentation 
-// abstraite des éléments syntaxiques de chaque langage, 
-// permettant au parser et au transformateur de partager des 
-// structures communes.
+use crate::utils::ValueType;
+use crate::utils::State;
 
 
-// src/ast.rs
-
-#[derive(Debug, Clone)]
+#[derive(Debug,Clone)]
 pub enum TypeScriptNode {
-    ConsoleLog(String),   // Ex : console.log("Hello, world!")
 
-    // ✅ Ajout de la déclaration de variable
+    ConsoleLog(String),
+
     VariableDeclaration {
         name: String,
-        value: String, // Peut être un nombre ou une chaîne
+        value: ValueType,
+        state: State,
     },
 
-    // ✅ Ajout du support pour les conditions
-    IfStatement {
-        condition: String,
-        body: Vec<TypeScriptNode>, // Liste d'instructions à exécuter
+    // IfStatement {
+    //     condition: String,
+    //     body: Vec<TypeScriptNode>,
+    // },
+}
+
+#[derive(Debug,Clone)]
+pub enum RustNode {
+
+    Println(String),
+
+    VariableDeclaration {
+        name: String,
+        value: ValueType,
+        state: State,
     },
+
+    // IfStatement {
+    //     condition: String,
+    //     body: Vec<RustNode>,
+    // },
+
 }

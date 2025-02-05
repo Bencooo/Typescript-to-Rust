@@ -1,38 +1,32 @@
-// 6 - Générateur de code rust
-
-// Le générateur de code Rust, qui prend l'AST Rust et produit 
-// du code Rust lisible. Il assemble les fonctions, variables, 
-// et autres structures en chaînes de caractères 
-// correspondant à la syntaxe Rust.
-
-// src/generator.rs
-
-use crate::transformer::RustNode;
+use crate::ast::RustNode;
+use crate::utils::{State, ValueType};
 
 pub fn generate_code(nodes: Vec<RustNode>) -> String {
     nodes
         .into_iter()
         .map(|node| match node {
-            RustNode::Println(text) => text,
-
-            RustNode::VariableDeclaration { name, value } => {
-                if value.parse::<f64>().is_ok() {
-                    format!("let {} = {};", name, value) // ✅ Si c'est un nombre, on garde tel quel
-                } else {
-                    format!("let {} = \"{}\".to_string();", name, value) // ✅ Si c'est une chaîne, on met des guillemets
-                }
-            }
-
-            RustNode::IfStatement { condition, body } => {
-                let body_code: String = body
-                    .into_iter()
-                    .map(|stmt| generate_code(vec![stmt])) // ✅ Générer chaque ligne du `if`
-                    .collect::<Vec<String>>()
-                    .join("\n    ");
-                format!("if {} {{\n    {}\n}}", condition, body_code)
+            RustNode::Println(text) => text,  // Gérer le nœud Println
+            RustNode::VariableDeclaration { name, value, state } => {
+                let var = match state {
+                    State::Mutable => {
+                        match value {
+                            ValueType::String(s) => format!("let mut {} : String = {:?};", name, s),
+                            ValueType::F64(f) => format!("let mut {} : f64 = {:?};", name, f),
+                            ValueType::Bool(b) => format!("let mut {} : bool = {:?};", name, b),
+                        }
+                    }
+                    State::Immutable => {
+                        match value {
+                            ValueType::String(s) => format!("let {} : String = {:?};", name, s),
+                            ValueType::F64(f) => format!("let {} : f64 = {:?};", name, f),
+                            ValueType::Bool(b) => format!("let {} : bool = {:?};", name, b),
+                        }
+                    }
+                    _ =>{"".to_string()}
+                };
+                var  // Retourne la déclaration de la variable
             }
         })
         .collect::<Vec<String>>()
-        .join("\n") // ✅ Ajouter un saut de ligne entre chaque instruction
+        .join("\n") // Ajouter un saut de ligne entre chaque instruction
 }
-
