@@ -16,10 +16,16 @@ pub enum Token {
         value: ValueType,
         state: State,
     },
+    Initialize{
+        name:String,
+        typevar: String,
+        state:State,
+    },
     Literal(String),
     Identifier(String),
     Function(String),
     Symbol(char),            // Symboles comme '(', ')', ';'
+    Echap(char),
     Assign,                  // Symbole '='
     Operator(String),  
     EOF,                     // Fin de fichier

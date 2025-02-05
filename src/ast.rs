@@ -15,8 +15,17 @@ pub enum TypeScriptNode {
         state: State,
     },
 
+    VariableInitialization {
+        name: String,
+        typevar : String,
+        state: State,
+    },
+
+    Symbol(char),
+    Echap(char),
+
     // IfStatement {
-    //     condition: String,
+    //     condition: Vec<TypeScriptNode>,
     //     body: Vec<TypeScriptNode>,
     // },
 }
@@ -32,8 +41,17 @@ pub enum RustNode {
         state: State,
     },
 
+    VariableInitialization {
+        name: String,
+        typevar: String,
+        state: State,
+    },
+
+    Symbol(char),
+    Echap(char),
+
     // IfStatement {
-    //     condition: String,
+    //     condition: Vec<RustNode>,
     //     body: Vec<RustNode>,
     // },
 

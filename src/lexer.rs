@@ -8,12 +8,14 @@ pub fn lex(code: &str) -> Vec<Token> {
     let mut i = 0;
     let mut state : State = State::NoneState;
     let mut name = "";
+    let mut echap = false;
 
     while i < chars.len() {
         match chars[i] {
             'c' if code[i..].starts_with("console.log") => {
                 tokens.push(Token::Keyword("console.log".to_string()));
                 i += "console.log".len(); // Avancer l'indice après "console.log"
+                echap = true;
             }
 
             'c' if code[i..].starts_with("const") => {
@@ -36,11 +38,23 @@ pub fn lex(code: &str) -> Vec<Token> {
                 }
                 name = "";
                 state = State::NoneState;
+                echap = true;
             }
 
-            '(' | ')' | '{' | '}' | ';' => {
+            '(' | ')'  => {
                 tokens.push(Token::Symbol(chars[i]));
                 i += 1;
+            }
+
+            | '{' | '}' | ';' => {
+                if echap {
+                    tokens.push(Token::Echap(chars[i]));
+                    i+=1;
+                    echap = false;
+                }else{
+                    tokens.push(Token::Symbol(chars[i]));
+                    i+=1;
+                }
             }
 
             '<' | '>' | '!' => {
@@ -75,11 +89,12 @@ pub fn lex(code: &str) -> Vec<Token> {
                     println!("✅ DEBUG: Lexer Détection de chaîne → {}", literal_value); // 🛠️ Debug
                     if name != "" && state != State::NoneState {
                         tokens.push(Token::Variable{name:name.to_string(),value:ValueType::String(literal_value.to_string()),state:state});
+                        echap = true;
                     }else{
                         tokens.push(Token::Literal(literal_value.to_string()));
                     }
 
-                    i = end_index + 1;
+                    i = end_index+1;
                 } else {
                     name = "";
                     state = State::NoneState;
@@ -99,6 +114,7 @@ pub fn lex(code: &str) -> Vec<Token> {
                 let number = &code[start..i];
                 if let Ok(n) = number.parse::<f64>() {
                     tokens.push(Token::Variable{name:name.to_string(),value:ValueType::F64(n),state:state});
+                    echap = true;
                 } else {
                     println!("❌ ERREUR: Nombre mal formé {}", number);
                     break;
@@ -115,8 +131,13 @@ pub fn lex(code: &str) -> Vec<Token> {
                 }
                 let ident = &code[start..i];
                 println!("✅ DEBUG: Lexer - Ajout Identifier {:?}", ident);
-                if state != State::NoneState {
+                if state != State::NoneState && name == ""{
                     name = ident;
+                }else if state != State::NoneState && name != ""{
+                    tokens.push(Token::Initialize{name:name.to_string(), typevar: ident.to_string(),state: state});
+                    name = "";
+                    state = State::NoneState;
+                    echap = true;
                 }else{
                     tokens.push(Token::Identifier(ident.to_string()));
                 }

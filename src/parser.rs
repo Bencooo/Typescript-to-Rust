@@ -30,10 +30,6 @@ pub fn parse(tokens: Vec<Token>) -> Vec<TypeScriptNode> {
                             i += 1;
                         }
 
-                        if let Token::Symbol(';') = &tokens[i] {
-                            i += 1;
-                        }
-
                         println!("✅ DEBUG: Ajout ConsoleLog CHAÎNE {:?}", text);
                         nodes.push(TypeScriptNode::ConsoleLog(format!("\"{}\"", text)));
                     }
@@ -49,19 +45,33 @@ pub fn parse(tokens: Vec<Token>) -> Vec<TypeScriptNode> {
                             i += 1;
                         }
 
-                        if let Token::Symbol(';') = &tokens[i] {
-                            i += 1;
-                        }
-
                         println!("✅ DEBUG: Ajout ConsoleLog VARIABLE {:?}", var_name);
                         nodes.push(TypeScriptNode::ConsoleLog(var_name.clone()));
                     }
+                    
+                    
                 }
+                
             }
 
             // Traitement des déclarations de variables
             Token::Variable{ name, value, state } => {
                 nodes.push(TypeScriptNode::VariableDeclaration{name: name.clone(),value: value.clone(),state: state.clone()});
+                i+=1;
+            }
+
+            Token::Initialize{name,typevar,state} => {
+                nodes.push(TypeScriptNode::VariableInitialization{name: name.clone(),typevar: typevar.clone(),state : state.clone()});
+                i+=1;
+            }
+
+            Token::Echap(symbol) => {
+                nodes.push(TypeScriptNode::Echap(symbol.clone()));
+                i+=1;
+            }
+
+            Token::Symbol(symbol) => {
+                nodes.push(TypeScriptNode::Symbol(symbol.clone()));
                 i+=1;
             }
 

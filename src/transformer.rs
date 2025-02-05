@@ -13,11 +13,11 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
                 // ✅ C'est un `Literal`, on enlève les guillemets
                 let cleaned_text = text.trim_matches('"').to_string();
                 println!("✅ DEBUG: ConsoleLog CHAÎNE → Avant: {:?}, Après: {:?}", text, cleaned_text);
-                RustNode::Println(format!("println!({});", text))
+                RustNode::Println(format!("println!({})", text))
             } else {
                 // ✅ C'est une `Variable`, on crée un Token pour la variable
                 println!("✅ DEBUG: ConsoleLog VARIABLE → {:?}", text);
-                RustNode::Println(format!("println!(\"{{}}\", {});", text))
+                RustNode::Println(format!("println!(\"{{}}\", {})", text))
             }
         }
 
@@ -25,6 +25,19 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
         TypeScriptNode::VariableDeclaration { name, value, state } => {
             RustNode::VariableDeclaration { name, value,state  }
         }
+
+        TypeScriptNode::VariableInitialization {name, typevar, state} => {
+            RustNode::VariableInitialization {name, typevar, state}
+        }
+
+        TypeScriptNode::Symbol(symbol) => {
+            RustNode::Symbol(symbol)
+        }
+
+        TypeScriptNode::Echap(symbol) => {
+            RustNode::Echap(symbol)
+        }
+
 
     }
 
