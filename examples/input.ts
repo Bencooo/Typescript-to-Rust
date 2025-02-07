@@ -1,6 +1,3 @@
-const x = "Hello";
-console.log(x);
-
-if (true) {
-    console.log("x est plus petit que 10 !");
+for (let i = 0; i > 5; i++) {
+    console.log(i);
 }

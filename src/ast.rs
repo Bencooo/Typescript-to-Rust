@@ -24,4 +24,18 @@ pub enum TypeScriptNode {
         condition: String,
         body: Vec<TypeScriptNode>, // Liste d'instructions à exécuter
     },
+
+    ForLoop {
+        initialization: Option<Box<TypeScriptNode>>,
+        condition: String,
+        increment: Option<Box<TypeScriptNode>>, // ✅ Correction ici
+        body: Vec<TypeScriptNode>,
+    },
+
+    WhileLoop {
+        initialization: Option<Box<TypeScriptNode>>, // `let i = 0;`
+        condition: String,                           // `i < 10`
+        body: Vec<TypeScriptNode>,                   // Contenu de la boucle
+        increment: Option<Box<TypeScriptNode>>,      // `i++`
+    },
 }

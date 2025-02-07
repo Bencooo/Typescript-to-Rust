@@ -1,5 +1,5 @@
-let x = "Hello".to_string();
-println!("{}", x);
-if  {
-    println!("x est plus petit que 10 !");
+let i = 0;
+while i > 5 {
+    println!("{}", i);
+    i += 1;
 }
