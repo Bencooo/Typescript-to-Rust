@@ -1,4 +1,5 @@
-println!("{}", x);
-if true {
-    println!("x est plus petit que 10 !");
+let i = 0;
+while i > 5 {
+    println!("{}", i);
+    i += 1;
 }
