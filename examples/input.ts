@@ -1,6 +1,11 @@
 const x = false;
+let y = false;
 console.log(x);
 
-if (true) {
-    console.log("x est plus petit que 10 !");
+if (!x) {
+    console.log(x);
+}
+
+if (y != x) {
+    console.log("y n'est pas egal a x");
 }
