@@ -6,6 +6,8 @@ pub fn generate_code(nodes: Vec<RustNode>) -> String {
 
     for node in nodes {
         let line = match node {
+
+            RustNode::Keyword(kw) => format!("{}",kw),
             // Gérer le nœud Println
             RustNode::Println(text) => text,
 
@@ -36,9 +38,11 @@ pub fn generate_code(nodes: Vec<RustNode>) -> String {
             }
 
             // Gérer les symboles
-            RustNode::Symbol(symbol) => format!("{}", symbol),
+            RustNode::Symbol(symbol) => symbol.to_string(),
 
             RustNode::Echap(symbol) => format!("{}\n", symbol),
+
+            RustNode::Operator(op) => format!("{}",op),
 
         };
 

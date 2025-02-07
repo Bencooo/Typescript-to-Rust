@@ -8,6 +8,7 @@ use crate::utils::State;
 pub enum TypeScriptNode {
 
     ConsoleLog(String),
+    Keyword(String),
 
     VariableDeclaration {
         name: String,
@@ -21,8 +22,10 @@ pub enum TypeScriptNode {
         state: State,
     },
 
+    Operator(String),
     Symbol(char),
     Echap(char),
+    Assign,
 
     // IfStatement {
     //     condition: Vec<TypeScriptNode>,
@@ -34,6 +37,7 @@ pub enum TypeScriptNode {
 pub enum RustNode {
 
     Println(String),
+    Keyword(String),
 
     VariableDeclaration {
         name: String,
@@ -47,6 +51,7 @@ pub enum RustNode {
         state: State,
     },
 
+    Operator(String),
     Symbol(char),
     Echap(char),
 

@@ -35,10 +35,26 @@ pub fn lex(code: &str) -> Vec<Token> {
                 } else if code[i..].starts_with("false") && state != State::NoneState && name != ""{
                     tokens.push(Token::Variable{name: name.to_string(),value:ValueType::Bool(false),state: state});
                     i += "false".len();
+                } else {
+                    if chars[i] == 'f' {
+                        tokens.push(Token::Identifier("false".to_string()));
+                        i += "true".len()-1;
+                    }else {
+                        tokens.push(Token::Identifier("true".to_string()));
+                        i += "false".len()-1;
+                    }
                 }
                 name = "";
                 state = State::NoneState;
                 echap = true;
+            }
+
+            'i' => {
+                if code[i..].starts_with("if"){
+                    tokens.push(Token::Keyword("if".to_string()));
+                    echap = true;
+                    i+= "if".len();
+                }
             }
 
             '(' | ')'  => {
@@ -47,7 +63,7 @@ pub fn lex(code: &str) -> Vec<Token> {
             }
 
             | '{' | '}' | ';' => {
-                if echap {
+                if echap || chars[i] == '}' {
                     tokens.push(Token::Echap(chars[i]));
                     i+=1;
                     echap = false;
@@ -71,11 +87,17 @@ pub fn lex(code: &str) -> Vec<Token> {
             }
 
             '=' => {
+                println!("{} ",i);
                 if i + 1 < chars.len() && chars[i + 1] == '=' {
                     tokens.push(Token::Operator("==".to_string()));
                     i += 2;  // Incrémenter de 2 pour passer le "=="
                 } else {
-                    tokens.push(Token::Assign);
+                    if state == State::NoneState{
+                        println!("ASSIGN");
+                        tokens.push(Token::Assign);
+                        echap = true;
+                        
+                    }
                     i += 1;
                 }
             }
@@ -141,6 +163,7 @@ pub fn lex(code: &str) -> Vec<Token> {
                 }else{
                     tokens.push(Token::Identifier(ident.to_string()));
                 }
+                i+= ident.len()-1;
                 
             }
 
@@ -152,5 +175,6 @@ pub fn lex(code: &str) -> Vec<Token> {
     }
 
     tokens.push(Token::EOF); // Marque la fin du fichier
+    println!("{:?}",tokens);
     tokens
 }

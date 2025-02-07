@@ -5,6 +5,9 @@ use crate::token::Token;
 
 pub fn transform(node: TypeScriptNode) -> RustNode {
     match node {
+        TypeScriptNode::Keyword(kw) => {
+            RustNode::Keyword(kw)
+        }
         // ✅ Gestion correcte de `console.log(...)`
         TypeScriptNode::ConsoleLog(text) => {
             println!("✅ DEBUG: Transformer - Début conversion ConsoleLog({:?})", text);
@@ -36,6 +39,14 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
 
         TypeScriptNode::Echap(symbol) => {
             RustNode::Echap(symbol)
+        }
+
+        TypeScriptNode::Operator(op) => {
+            RustNode::Operator(op)
+        }
+
+        TypeScriptNode::Assign => {
+            RustNode::Symbol('=')
         }
 
 
