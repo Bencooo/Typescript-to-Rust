@@ -16,7 +16,13 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Keyword("console.log".to_string()));
                 i += "console.log".len(); // Avancer l'indice après "console.log"
                 echap = true;
+
+            // ✅ Détection de `console`
+            'f' if code[i..].starts_with("for") => {
+                tokens.push(Token::Keyword("for".to_string()));
+                i += 3; // Avance après "for"
             }
+
 
             'c' if code[i..].starts_with("const") => {
                 state = State::Immutable;
@@ -61,6 +67,16 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Symbol(chars[i]));
                 i += 1;
             }
+            't' if code[i..].starts_with("true") => {
+                tokens.push(Token::Boolean(true));
+                i += "true".len();
+                println!("✅ DEBUG: Lexer - Détection du booléen `true`");
+            }
+            'f' if code[i..].starts_with("false") => {
+                tokens.push(Token::Boolean(false));
+                i += "false".len();
+                println!("✅ DEBUG: Lexer - Détection du booléen `false`");
+            }
 
             | '{' | '}' | ';' => {
                 if echap || chars[i] == '}' {
@@ -98,8 +114,25 @@ pub fn lex(code: &str) -> Vec<Token> {
                         echap = true;
                         
                     }
+                }
+              }
+
+            // Détection des nombres (entiers et flottants)
+            _ if chars[i].is_digit(10) => {
+                let start = i;
+                while i < chars.len() && (chars[i].is_digit(10) || chars[i] == '.') {
                     i += 1;
                 }
+                let number = &code[start..i];
+                if let Ok(n) = number.parse::<f64>() {
+                    tokens.push(Token::Variable{name:name.to_string(),value:ValueType::F64(n),state:state});
+                    echap = true;
+                } else {
+                    println!("❌ ERREUR: Nombre mal formé {}", number);
+                    break;
+                }
+                name = "";
+                state = State::NoneState;
             }
 
             '"' => {
@@ -126,26 +159,21 @@ pub fn lex(code: &str) -> Vec<Token> {
                 name = "";
                 state = State::NoneState;
             }
-            
-            // Détection des nombres (entiers et flottants)
-            _ if chars[i].is_digit(10) => {
-                let start = i;
-                while i < chars.len() && (chars[i].is_digit(10) || chars[i] == '.') {
+
+            '<' | '>' | '!' => {
+                let mut op = chars[i].to_string();
+                i += 1;
+
+                if i < chars.len() && chars[i] == '=' {
+                    op += "=";
                     i += 1;
                 }
-                let number = &code[start..i];
-                if let Ok(n) = number.parse::<f64>() {
-                    tokens.push(Token::Variable{name:name.to_string(),value:ValueType::F64(n),state:state});
-                    echap = true;
-                } else {
-                    println!("❌ ERREUR: Nombre mal formé {}", number);
-                    break;
-                }
-                name = "";
-                state = State::NoneState;
+
+                println!("✅ DEBUG: Lexer - Détection de l'opérateur `{}`", op); // Debug
+                tokens.push(Token::Operator(op));
             }
 
-            // Détection des identifiants (variables, fonctions)
+           // Détection des identifiants (variables, fonctions)
             _ if chars[i].is_alphabetic() => {
                 let start = i;
                 while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {

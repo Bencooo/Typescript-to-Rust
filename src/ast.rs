@@ -21,16 +21,29 @@ pub enum TypeScriptNode {
         typevar : String,
         state: State,
     },
-
+  
     Operator(String),
     Symbol(char),
     Echap(char),
-    Assign,
+
 
     // IfStatement {
     //     condition: Vec<TypeScriptNode>,
     //     body: Vec<TypeScriptNode>,
     // },
+    ForLoop {
+        initialization: Option<Box<TypeScriptNode>>,
+        condition: String,
+        increment: Option<Box<TypeScriptNode>>, // ✅ Correction ici
+        body: Vec<TypeScriptNode>,
+    },
+
+    WhileLoop {
+        initialization: Option<Box<TypeScriptNode>>, // `let i = 0;`
+        condition: String,                           // `i < 10`
+        body: Vec<TypeScriptNode>,                   // Contenu de la boucle
+        increment: Option<Box<TypeScriptNode>>,      // `i++`
+    },
 }
 
 #[derive(Debug,Clone)]
@@ -54,6 +67,7 @@ pub enum RustNode {
     Operator(String),
     Symbol(char),
     Echap(char),
+    Expression(String),
 
     // IfStatement {
     //     condition: Vec<RustNode>,
