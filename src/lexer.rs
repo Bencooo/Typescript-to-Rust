@@ -1,62 +1,71 @@
-// 2 - lexeur pour l'analyse lexicale
-
-// Contient le lexeur, qui convertit le code source TypeScript
-// en une liste de Token.
-// Il gère le traitement des mots-clés, identifiants,
-// littéraux, symboles, et autres éléments syntaxiques.
-// C’est la première étape du pipeline de compilation.
-
-// src/lexer.rs
-
 use crate::token::Token;
+use crate::utils::State;
+use crate::utils::ValueType;
 
 pub fn lex(code: &str) -> Vec<Token> {
     let mut tokens = Vec::new();
     let chars: Vec<char> = code.chars().collect();
     let mut i = 0;
+    let mut state : State = State::NoneState;
+    let mut name = "";
+    let mut echap = false;
 
     while i < chars.len() {
         match chars[i] {
+            'c' if code[i..].starts_with("console.log") => {
+                tokens.push(Token::Keyword("console.log".to_string()));
+                i += "console.log".len(); // Avancer l'indice après "console.log"
+                echap = true;
+
             // ✅ Détection de `console`
             'f' if code[i..].starts_with("for") => {
                 tokens.push(Token::Keyword("for".to_string()));
                 i += 3; // Avance après "for"
             }
 
-            'c' if code[i..].starts_with("console") => {
-                tokens.push(Token::Keyword("console".to_string()));
-                i += "console".len();
-            }
-            // ✅ Détection de `log`
-            'l' if code[i..].starts_with("log") => {
-                tokens.push(Token::Identifier("log".to_string()));
-                i += "log".len();
-            }
 
-            // ✅ Détection des autres mots-clés (`const`, `let`, etc.)
             'c' if code[i..].starts_with("const") => {
-                tokens.push(Token::Keyword("const".to_string()));
+                state = State::Immutable;
                 i += "const".len();
             }
+
             'l' if code[i..].starts_with("let") => {
-                tokens.push(Token::Keyword("let".to_string()));
+                state = State::Mutable;
                 i += "let".len();
             }
-            'f' if code[i..].starts_with("function") => {
-                tokens.push(Token::Keyword("function".to_string()));
-                i += "function".len();
+
+            't' | 'f' => {
+                if code[i..].starts_with("true") && state != State::NoneState && name != ""{
+                    tokens.push(Token::Variable{name: name.to_string(),value:ValueType::Bool(true),state: state});
+                    i += "true".len();
+                } else if code[i..].starts_with("false") && state != State::NoneState && name != ""{
+                    tokens.push(Token::Variable{name: name.to_string(),value:ValueType::Bool(false),state: state});
+                    i += "false".len();
+                } else {
+                    if chars[i] == 'f' {
+                        tokens.push(Token::Identifier("false".to_string()));
+                        i += "true".len()-1;
+                    }else {
+                        tokens.push(Token::Identifier("true".to_string()));
+                        i += "false".len()-1;
+                    }
+                }
+                name = "";
+                state = State::NoneState;
+                echap = true;
             }
-            'i' if code[i..].starts_with("if") => {
-                tokens.push(Token::Keyword("if".to_string()));
-                i += "if".len();
+
+            'i' => {
+                if code[i..].starts_with("if"){
+                    tokens.push(Token::Keyword("if".to_string()));
+                    echap = true;
+                    i+= "if".len();
+                }
             }
-            'e' if code[i..].starts_with("else") => {
-                tokens.push(Token::Keyword("else".to_string()));
-                i += "else".len();
-            }
-            'r' if code[i..].starts_with("return") => {
-                tokens.push(Token::Keyword("return".to_string()));
-                i += "return".len();
+
+            '(' | ')'  => {
+                tokens.push(Token::Symbol(chars[i]));
+                i += 1;
             }
             't' if code[i..].starts_with("true") => {
                 tokens.push(Token::Boolean(true));
@@ -69,72 +78,23 @@ pub fn lex(code: &str) -> Vec<Token> {
                 println!("✅ DEBUG: Lexer - Détection du booléen `false`");
             }
 
-            // ✅ Détection des identifiants (variables, fonctions)
-            // ✅ Détection des identifiants (variables, fonctions)
-            // ✅ Détection des identifiants (variables, fonctions)
-            _ if chars[i].is_alphabetic() => {
-                let start = i;
-                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {
-                    i += 1;
-                }
-                let mut ident = code[start..i].to_string();
-
-                // ✅ Forcer la suppression des guillemets s'ils sont présents
-                if ident.starts_with('"') && ident.ends_with('"') {
-                    ident = ident[1..ident.len() - 1].to_string();
-                }
-
-                //println!("✅ DEBUG: Lexer - Ajout Identifier `{}`", ident); // Debug clair
-                println!("✅ DEBUG: Lexer - Ajout Identifier {:?}", ident);
-                tokens.push(Token::Identifier(ident));
-            }
-
-            _ if code[i..].starts_with("true") && (i + 4 >= chars.len() || !chars[i + 4].is_alphanumeric()) => {
-                tokens.push(Token::Keyword("true".to_string()));
-                println!("✅ DEBUG: Lexer - Détection du booléen `true`");
-                i += 4; // Avance après `true`
-            },
-            
-            _ if code[i..].starts_with("false") && (i + 5 >= chars.len() || !chars[i + 5].is_alphanumeric()) => {
-                tokens.push(Token::Keyword("false".to_string()));
-                println!("✅ DEBUG: Lexer - Détection du booléen `false`");
-                i += 5; // Avance après `false`
-            },
-
-            // ✅ Détection des nombres (42, 3.14)
-            _ if chars[i].is_digit(10) => {
-                let start = i;
-                while i < chars.len() && (chars[i].is_digit(10) || chars[i] == '.') {
-                    i += 1;
-                }
-                let number = &code[start..i];
-                tokens.push(Token::Number(number.parse::<f64>().unwrap()));
-            }
-
-            // ✅ Détection des chaînes de caractères `"Hello"`
-            '"' => {
-                let start = i + 1;
-                if let Some(end_offset) = code[start..].find('"') {
-                    let end_index = start + end_offset;
-                    let literal_value = &code[start..end_index];
-
-                    println!("✅ DEBUG: Lexer Détection de chaîne → {}", literal_value); // 🛠️ Debug
-                    tokens.push(Token::Literal(literal_value.to_string())); // ✅ Ajoute comme Literal
-
-                    i = end_index + 1;
-                } else {
-                    println!("❌ ERREUR: Chaîne non fermée !");
+            | '{' | '}' | ';' => {
+                if echap || chars[i] == '}' {
+                    tokens.push(Token::Echap(chars[i]));
+                    i+=1;
+                    echap = false;
+                }else{
+                    tokens.push(Token::Symbol(chars[i]));
+                    i+=1;
                 }
             }
 
-            // ✅ Détection des opérateurs de comparaison (`<`, `>`, `<=`, `>=`, `==`, `!=`)
-            '<' | '>' | '=' | '!' | '+' | '-' => {
+            '<' | '>' | '!' => {
                 let mut op = chars[i].to_string();
                 i += 1;
 
-                // Vérifie si l'opérateur est suivi de '=' (ex: `<=`, `>=`, `!=`, `==`)
-                if i < chars.len() && (chars[i] == '=' || chars[i] == '+' || chars[i] == '-') {
-                    op.push(chars[i]);
+                if i < chars.len() && chars[i] == '=' {
+                    op += "=";
                     i += 1;
                 }
 
@@ -142,24 +102,107 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Operator(op));
             }
 
-            // ✅ Détection de l'affectation `=`
-            /*'=' => {
-                tokens.push(Token::Assign);
-                i += 1;
-            }*/
+            '=' => {
+                println!("{} ",i);
+                if i + 1 < chars.len() && chars[i + 1] == '=' {
+                    tokens.push(Token::Operator("==".to_string()));
+                    i += 2;  // Incrémenter de 2 pour passer le "=="
+                } else {
+                    if state == State::NoneState{
+                        println!("ASSIGN");
+                        tokens.push(Token::Assign);
+                        echap = true;
+                        
+                    }
+                }
+              }
 
-            // ✅ Détection des symboles `(`, `)`, `{`, `}`, `;`
-            '(' | ')' | '{' | '}' | ';' => {
-                tokens.push(Token::Symbol(chars[i]));
-                i += 1;
+            // Détection des nombres (entiers et flottants)
+            _ if chars[i].is_digit(10) => {
+                let start = i;
+                while i < chars.len() && (chars[i].is_digit(10) || chars[i] == '.') {
+                    i += 1;
+                }
+                let number = &code[start..i];
+                if let Ok(n) = number.parse::<f64>() {
+                    tokens.push(Token::Variable{name:name.to_string(),value:ValueType::F64(n),state:state});
+                    echap = true;
+                } else {
+                    println!("❌ ERREUR: Nombre mal formé {}", number);
+                    break;
+                }
+                name = "";
+                state = State::NoneState;
             }
 
-            // ✅ Ignorer les espaces et caractères inconnus
-            _ => i += 1,
+            '"' => {
+                let start = i + 1;
+                if let Some(end_offset) = code[start..].find('"') {
+                    let end_index = start + end_offset;
+                    let literal_value = &code[start..end_index];
+
+                    println!("✅ DEBUG: Lexer Détection de chaîne → {}", literal_value); // 🛠️ Debug
+                    if name != "" && state != State::NoneState {
+                        tokens.push(Token::Variable{name:name.to_string(),value:ValueType::String(literal_value.to_string()),state:state});
+                        echap = true;
+                    }else{
+                        tokens.push(Token::Literal(literal_value.to_string()));
+                    }
+
+                    i = end_index+1;
+                } else {
+                    name = "";
+                    state = State::NoneState;
+                    println!("❌ ERREUR: Chaîne non fermée !");
+                    break; // Sortie en cas d'erreur de chaîne non fermée
+                }
+                name = "";
+                state = State::NoneState;
+            }
+
+            '<' | '>' | '!' => {
+                let mut op = chars[i].to_string();
+                i += 1;
+
+                if i < chars.len() && chars[i] == '=' {
+                    op += "=";
+                    i += 1;
+                }
+
+                println!("✅ DEBUG: Lexer - Détection de l'opérateur `{}`", op); // Debug
+                tokens.push(Token::Operator(op));
+            }
+
+           // Détection des identifiants (variables, fonctions)
+            _ if chars[i].is_alphabetic() => {
+                let start = i;
+                while i < chars.len() && (chars[i].is_alphanumeric() || chars[i] == '_') {
+                    i += 1;
+                }
+                let ident = &code[start..i];
+                println!("✅ DEBUG: Lexer - Ajout Identifier {:?}", ident);
+                if state != State::NoneState && name == ""{
+                    name = ident;
+                }else if state != State::NoneState && name != ""{
+                    tokens.push(Token::Initialize{name:name.to_string(), typevar: ident.to_string(),state: state});
+                    name = "";
+                    state = State::NoneState;
+                    echap = true;
+                }else{
+                    tokens.push(Token::Identifier(ident.to_string()));
+                }
+                i+= ident.len()-1;
+                
+            }
+
+            // Autres caractères, avancer l'indice
+            _ => {
+                i += 1;
+            }
         }
     }
-    println!("✅ DEBUG: Tokens générés : {:?}", tokens);
 
     tokens.push(Token::EOF); // Marque la fin du fichier
+    println!("{:?}",tokens);
     tokens
 }

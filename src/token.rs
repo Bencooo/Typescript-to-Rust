@@ -5,17 +5,27 @@
 // (function, let), les symboles (+, =, {, }), 
 // ou les littéraux ("hello", 42).
 
-
-
+use crate::utils::State;
+use crate::utils::ValueType;
 
 #[derive(Debug, PartialEq, Clone)]
 pub enum Token {
-    Keyword(String),         // Exemple : "console" ou "log"
-    Identifier(String),      // Nom de fonction ou variable, ici : "log"
-    Literal(String),         // Chaîne de caractères, ici : "Hello, world!"
-    Boolean(bool),
-    Number(f64),             // Nombres (ex: 42, 3.14)
+    Keyword(String),         // Exemple : 
+    Variable{
+        name:String,
+        value: ValueType,
+        state: State,
+    },
+    Initialize{
+        name:String,
+        typevar: String,
+        state:State,
+    },
+    Literal(String),
+    Identifier(String),
+    Function(String),
     Symbol(char),            // Symboles comme '(', ')', ';'
+    Echap(char),
     Assign,                  // Symbole '='
     Operator(String),  
     EOF,                     // Fin de fichier

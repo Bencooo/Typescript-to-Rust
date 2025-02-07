@@ -1,30 +1,36 @@
-// 3 - Définition de l'AST pour les deux anguage (ts et rust)
+// Le fichier AST va contenir les structures de données pour les langages TypeScript et Rust
 
-// Définit les structures de données pour les deux AST 
-// (TypeScript et Rust). Ce fichier centralise la représentation 
-// abstraite des éléments syntaxiques de chaque langage, 
-// permettant au parser et au transformateur de partager des 
-// structures communes.
+use crate::utils::ValueType;
+use crate::utils::State;
 
 
-// src/ast.rs
-
-#[derive(Debug, Clone)]
+#[derive(Debug,Clone)]
 pub enum TypeScriptNode {
-    ConsoleLog(String),   // Ex : console.log("Hello, world!")
 
-    // ✅ Ajout de la déclaration de variable
+    ConsoleLog(String),
+    Keyword(String),
+
     VariableDeclaration {
         name: String,
-        value: String, // Peut être un nombre ou une chaîne
+        value: ValueType,
+        state: State,
     },
 
-    // ✅ Ajout du support pour les conditions
-    IfStatement {
-        condition: String,
-        body: Vec<TypeScriptNode>, // Liste d'instructions à exécuter
+    VariableInitialization {
+        name: String,
+        typevar : String,
+        state: State,
     },
+  
+    Operator(String),
+    Symbol(char),
+    Echap(char),
 
+
+    // IfStatement {
+    //     condition: Vec<TypeScriptNode>,
+    //     body: Vec<TypeScriptNode>,
+    // },
     ForLoop {
         initialization: Option<Box<TypeScriptNode>>,
         condition: String,
@@ -38,4 +44,34 @@ pub enum TypeScriptNode {
         body: Vec<TypeScriptNode>,                   // Contenu de la boucle
         increment: Option<Box<TypeScriptNode>>,      // `i++`
     },
+}
+
+#[derive(Debug,Clone)]
+pub enum RustNode {
+
+    Println(String),
+    Keyword(String),
+
+    VariableDeclaration {
+        name: String,
+        value: ValueType,
+        state: State,
+    },
+
+    VariableInitialization {
+        name: String,
+        typevar: String,
+        state: State,
+    },
+
+    Operator(String),
+    Symbol(char),
+    Echap(char),
+    Expression(String),
+
+    // IfStatement {
+    //     condition: Vec<RustNode>,
+    //     body: Vec<RustNode>,
+    // },
+
 }
