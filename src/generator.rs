@@ -36,58 +36,7 @@ pub fn generate_code(nodes: Vec<RustNode>) -> String {
                     State::Immutable => format!("let {} : {}", name, typevar),
                     _ => "".to_string(),
                 }
-          }
-
-            RustNode::ForLoop { initialization, condition, increment, body } => {
-                let init_code = initialization
-                    .map(|init| generate_code(vec![*init])) // ✅ Générer l'initialisation (ex: `let i = 0;`)
-                    .unwrap_or_default();
-            
-                let incr_code = increment
-                    .map(|incr| generate_code(vec![*incr])) // ✅ Générer l'incrémentation (ex: `i += 1;`)
-                    .unwrap_or_default();
-            
-                let body_code: String = body
-                    .into_iter()
-                    .map(|stmt| generate_code(vec![stmt])) // ✅ Générer chaque ligne du `for`
-                    .collect::<Vec<String>>()
-                    .join("\n    ");
-            
-                format!(
-                    "{}\nwhile {} {{\n    {}\n    {}\n}}",
-                    init_code, condition, body_code, incr_code
-                )
             }
-
-            RustNode::WhileLoop {
-                initialization,
-                condition,
-                increment,
-                body,
-            } => {
-                let init_code = initialization
-                    .map(|init| generate_code(vec![*init]))
-                    .unwrap_or("".to_string());
-
-                let body_code = body
-                    .into_iter()
-                    .map(|stmt| generate_code(vec![stmt]))
-                    .collect::<Vec<String>>()
-                    .join("\n    ");
-
-                let incr_code = increment
-                    .map(|incr| generate_code(vec![*incr]))
-                    .unwrap_or("".to_string());
-
-                format!(
-                    "{}\nwhile {} {{\n    {}\n    {}\n}}",
-                    init_code, condition, body_code, incr_code
-                )
-            }
-
-            RustNode::Expression(expr) => expr,
-            
-
             // Gérer les symboles
             RustNode::Symbol(symbol) => symbol.to_string(),
 

@@ -1,6 +1,6 @@
 
 use crate::ast::RustNode;
-use crate::token::Token;
+use crate::ast::TypeScriptNode;
 
 pub fn transform(node: TypeScriptNode) -> RustNode {
     match node {
@@ -36,56 +36,51 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
             RustNode::Symbol(symbol)
         }
 
-        TypeScriptNode::ForLoop { initialization, condition, increment, body } => {
-            println!(
-                "✅ DEBUG: Transformer - Détection `for` avec init `{:?}`, condition `{}`, incr `{:?}` et body `{:?}`",
-                initialization, condition, increment, body
-            );
+        // TypeScriptNode::ForLoop { initialization, condition, increment, body } => {
+        //     println!(
+        //         "✅ DEBUG: Transformer - Détection `for` avec init `{:?}`, condition `{}`, incr `{:?}` et body `{:?}`",
+        //         initialization, condition, increment, body
+        //     );
         
-            let rust_initialization = initialization.map(|init| transform(*init));
+        //     let rust_initialization = initialization.map(|init| transform(*init));
         
-            let rust_increment = increment.map(|incr| match *incr {
-                TypeScriptNode::VariableDeclaration { name, value } => {
-                    // ✅ Correction : Transforme `i++` en `i += 1;`
-                    RustNode::Expression(format!("{} += 1;", name))
-                }
-                _ => transform(*incr),
-            });
+        //     let rust_increment = increment.map(|incr| match *incr {
+        //         TypeScriptNode::VariableDeclaration { name, value } => {
+        //             // ✅ Correction : Transforme `i++` en `i += 1;`
+        //             RustNode::Expression(format!("{} += 1;", name))
+        //         }
+        //         _ => transform(*incr),
+        //     });
         
-            let rust_body = body.into_iter().map(transform).collect::<Vec<RustNode>>();
+        //     let rust_body = body.into_iter().map(transform).collect::<Vec<RustNode>>();
         
-            RustNode::WhileLoop {
-                initialization: rust_initialization.map(Box::new),
-                condition,
-                increment: rust_increment.map(Box::new),
-                body: rust_body,
-            }
-        }
+        //     RustNode::WhileLoop {
+        //         initialization: rust_initialization.map(Box::new),
+        //         condition,
+        //         increment: rust_increment.map(Box::new),
+        //         body: rust_body,
+        //     }
+        // }
         
 
-        TypeScriptNode::WhileLoop { initialization, condition, increment, body } => {
-            println!(
-                "✅ DEBUG: Transformer - Détection `while` Rust avec init `{:?}`, condition `{}`, incr `{:?}` et body `{:?}`",
-                initialization, condition, increment, body
-            );
+        // TypeScriptNode::WhileLoop { initialization, condition, increment, body } => {
+        //     println!(
+        //         "✅ DEBUG: Transformer - Détection `while` Rust avec init `{:?}`, condition `{}`, incr `{:?}` et body `{:?}`",
+        //         initialization, condition, increment, body
+        //     );
     
-            let rust_initialization = initialization.map(|init| Box::new(transform(*init)));
-            let rust_increment = increment.map(|incr| Box::new(transform(*incr)));
-            let rust_body = body.into_iter().map(transform).collect::<Vec<RustNode>>();
+        //     let rust_initialization = initialization.map(|init| Box::new(transform(*init)));
+        //     let rust_increment = increment.map(|incr| Box::new(transform(*incr)));
+        //     let rust_body = body.into_iter().map(transform).collect::<Vec<RustNode>>();
     
-            RustNode::WhileLoop {
-                initialization: rust_initialization,
-                condition,
-                increment: rust_increment,
-                body: rust_body,
-            }
-        }
+        //     RustNode::WhileLoop {
+        //         initialization: rust_initialization,
+        //         condition,
+        //         increment: rust_increment,
+        //         body: rust_body,
+        //     }
+        // }
         
-        
-        
-    }
-}
-
         TypeScriptNode::Echap(symbol) => {
             RustNode::Echap(symbol)
         }
@@ -97,8 +92,7 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
         TypeScriptNode::Assign => {
             RustNode::Symbol('=')
         }
-
-
+        
+        
     }
-
 }

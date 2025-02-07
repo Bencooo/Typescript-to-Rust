@@ -21,7 +21,7 @@ pub enum TypeScriptNode {
         typevar : String,
         state: State,
     },
-  
+    Assign,
     Operator(String),
     Symbol(char),
     Echap(char),
@@ -31,19 +31,19 @@ pub enum TypeScriptNode {
     //     condition: Vec<TypeScriptNode>,
     //     body: Vec<TypeScriptNode>,
     // },
-    ForLoop {
-        initialization: Option<Box<TypeScriptNode>>,
-        condition: String,
-        increment: Option<Box<TypeScriptNode>>, // ✅ Correction ici
-        body: Vec<TypeScriptNode>,
-    },
+    // ForLoop {
+    //     initialization: Option<Box<TypeScriptNode>>,
+    //     condition: String,
+    //     increment: Option<Box<TypeScriptNode>>, // ✅ Correction ici
+    //     body: Vec<TypeScriptNode>,
+    // },
 
-    WhileLoop {
-        initialization: Option<Box<TypeScriptNode>>, // `let i = 0;`
-        condition: String,                           // `i < 10`
-        body: Vec<TypeScriptNode>,                   // Contenu de la boucle
-        increment: Option<Box<TypeScriptNode>>,      // `i++`
-    },
+    // WhileLoop {
+    //     initialization: Option<Box<TypeScriptNode>>, // `let i = 0;`
+    //     condition: String,                           // `i < 10`
+    //     body: Vec<TypeScriptNode>,                   // Contenu de la boucle
+    //     increment: Option<Box<TypeScriptNode>>,      // `i++`
+    // },
 }
 
 #[derive(Debug,Clone)]
@@ -64,10 +64,24 @@ pub enum RustNode {
         state: State,
     },
 
+    // ForLoop {
+    //     initialization: Option<Box<TypeScriptNode>>,
+    //     condition: String,
+    //     increment: Option<Box<TypeScriptNode>>, // ✅ Correction ici
+    //     body: Vec<TypeScriptNode>,
+    // },
+
+    // WhileLoop {
+    //     initialization: Option<Box<TypeScriptNode>>, // `let i = 0;`
+    //     condition: String,                           // `i < 10`
+    //     body: Vec<TypeScriptNode>,                   // Contenu de la boucle
+    //     increment: Option<Box<TypeScriptNode>>,      // `i++`
+    // },
+
     Operator(String),
     Symbol(char),
     Echap(char),
-    Expression(String),
+    //Expression(String),
 
     // IfStatement {
     //     condition: Vec<RustNode>,

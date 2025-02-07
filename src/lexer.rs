@@ -16,13 +16,13 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Keyword("console.log".to_string()));
                 i += "console.log".len(); // Avancer l'indice après "console.log"
                 echap = true;
+            }
 
             // ✅ Détection de `console`
             'f' if code[i..].starts_with("for") => {
                 tokens.push(Token::Keyword("for".to_string()));
                 i += 3; // Avance après "for"
             }
-
 
             'c' if code[i..].starts_with("const") => {
                 state = State::Immutable;
@@ -67,26 +67,15 @@ pub fn lex(code: &str) -> Vec<Token> {
                 tokens.push(Token::Symbol(chars[i]));
                 i += 1;
             }
-            't' if code[i..].starts_with("true") => {
-                tokens.push(Token::Boolean(true));
-                i += "true".len();
-                println!("✅ DEBUG: Lexer - Détection du booléen `true`");
-            }
-            'f' if code[i..].starts_with("false") => {
-                tokens.push(Token::Boolean(false));
-                i += "false".len();
-                println!("✅ DEBUG: Lexer - Détection du booléen `false`");
-            }
 
-            | '{' | '}' | ';' => {
+            '{' | '}' | ';' => {
                 if echap || chars[i] == '}' {
                     tokens.push(Token::Echap(chars[i]));
-                    i+=1;
                     echap = false;
                 }else{
                     tokens.push(Token::Symbol(chars[i]));
-                    i+=1;
                 }
+                i+=1;
             }
 
             '<' | '>' | '!' => {
@@ -112,10 +101,10 @@ pub fn lex(code: &str) -> Vec<Token> {
                         println!("ASSIGN");
                         tokens.push(Token::Assign);
                         echap = true;
-                        
                     }
+                    i+=1;
                 }
-              }
+            }
 
             // Détection des nombres (entiers et flottants)
             _ if chars[i].is_digit(10) => {
@@ -205,4 +194,5 @@ pub fn lex(code: &str) -> Vec<Token> {
     tokens.push(Token::EOF); // Marque la fin du fichier
     println!("{:?}",tokens);
     tokens
+
 }
