@@ -36,6 +36,10 @@ pub fn transform(node: TypeScriptNode) -> RustNode {
             RustNode::Symbol(symbol)
         }
 
+        TypeScriptNode::Number(n) => {
+            RustNode::F64(n)
+        }
+
         // TypeScriptNode::ForLoop { initialization, condition, increment, body } => {
         //     println!(
         //         "✅ DEBUG: Transformer - Détection `for` avec init `{:?}`, condition `{}`, incr `{:?}` et body `{:?}`",

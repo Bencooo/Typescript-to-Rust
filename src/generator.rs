@@ -44,6 +44,8 @@ pub fn generate_code(nodes: Vec<RustNode>) -> String {
 
             RustNode::Operator(op) => format!("{}",op),
 
+            RustNode::F64(n) => format!("{}",n),
+
         };
 
         result.push(line);

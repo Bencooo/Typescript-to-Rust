@@ -25,6 +25,7 @@ pub enum TypeScriptNode {
     Operator(String),
     Symbol(char),
     Echap(char),
+    Number(f64),
 
 
     // IfStatement {
@@ -63,6 +64,8 @@ pub enum RustNode {
         typevar: String,
         state: State,
     },
+
+    F64(f64),
 
     // ForLoop {
     //     initialization: Option<Box<TypeScriptNode>>,

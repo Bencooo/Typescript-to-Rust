@@ -23,7 +23,7 @@ pub enum Token {
     },
     Literal(String),
     Identifier(String),
-    Function(String),
+    Number(f64),
     Symbol(char),            // Symboles comme '(', ')', ';'
     Echap(char),
     Assign,                  // Symbole '='

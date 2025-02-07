@@ -108,12 +108,24 @@ pub fn lex(code: &str) -> Vec<Token> {
                 }
                 let number = &code[start..i];
                 if let Ok(n) = number.parse::<f64>() {
-                    tokens.push(Token::Variable{name:name.to_string(),value:ValueType::F64(n),state:state});
-                    echap = true;
+                    if name != "" && state != State::NoneState {
+                        // Si le nom est défini et que l'état est défini (différent de NoneState)
+                        tokens.push(Token::Variable { name: name.to_string(), value: ValueType::F64(number.parse().unwrap()), state: state });
+                        echap = true;
+                    } else if name == "" && state == State::NoneState {
+                        // Si le nom est vide et l'état est NoneState
+                        tokens.push(Token::Number(number.parse().unwrap()));
+                    } else {
+                        // Cas où le nombre est bien formé mais ne correspond pas aux autres conditions
+                        println!("❌ ERREUR: Nombre mal formé {}", number);
+                        break; // Sortir si le nombre est mal formé
+                    }
                 } else {
+                    // Si la conversion du nombre échoue
                     println!("❌ ERREUR: Nombre mal formé {}", number);
                     break;
                 }
+                
                 name = "";
                 state = State::NoneState;
             }

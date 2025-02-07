@@ -94,6 +94,11 @@ pub fn parse(tokens: Vec<Token>) -> Vec<TypeScriptNode> {
                 nodes.push(TypeScriptNode::Assign);
                 i+=1;
             }
+
+            Token::Number(n) => {
+                nodes.push(TypeScriptNode::Number(n.clone()));
+                i+=1;
+            }
             
             _ => i += 1, // ✅ Continue à parcourir les tokens
         }
