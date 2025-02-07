@@ -18,12 +18,6 @@ pub fn lex(code: &str) -> Vec<Token> {
                 echap = true;
             }
 
-            // ✅ Détection de `console`
-            'f' if code[i..].starts_with("for") => {
-                tokens.push(Token::Keyword("for".to_string()));
-                i += 3; // Avance après "for"
-            }
-
             'c' if code[i..].starts_with("const") => {
                 state = State::Immutable;
                 i += "const".len();
@@ -44,10 +38,10 @@ pub fn lex(code: &str) -> Vec<Token> {
                 } else {
                     if chars[i] == 'f' {
                         tokens.push(Token::Identifier("false".to_string()));
-                        i += "true".len()-1;
+                        i += "false".len();
                     }else {
                         tokens.push(Token::Identifier("true".to_string()));
-                        i += "false".len()-1;
+                        i += "true".len();
                     }
                 }
                 name = "";
@@ -149,18 +143,6 @@ pub fn lex(code: &str) -> Vec<Token> {
                 state = State::NoneState;
             }
 
-            '<' | '>' | '!' => {
-                let mut op = chars[i].to_string();
-                i += 1;
-
-                if i < chars.len() && chars[i] == '=' {
-                    op += "=";
-                    i += 1;
-                }
-
-                println!("✅ DEBUG: Lexer - Détection de l'opérateur `{}`", op); // Debug
-                tokens.push(Token::Operator(op));
-            }
 
            // Détection des identifiants (variables, fonctions)
             _ if chars[i].is_alphabetic() => {

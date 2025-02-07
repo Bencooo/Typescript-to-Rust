@@ -9,4 +9,3 @@ if (!x) {
 if (y != x) {
     console.log("y n'est pas egal a x");
 }
-
